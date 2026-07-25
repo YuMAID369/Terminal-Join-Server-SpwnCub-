@@ -1,32 +1,27 @@
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
-local TweenService = game:GetService("TweenService")
-local lp = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local lp = game:GetService("Players").LocalPlayer
 
 local Clipboard = setclipboard or toclipboard or set_clipboard
 local serverFrames = {}
-local allServers = {}
 local isRefreshing = false
 
 local oldGui = lp.PlayerGui:FindFirstChild("TerminalServerGui")
 if oldGui then oldGui:Destroy() end
 
 local function Create(className, parent, properties, corner, stroke)
-    local obj = Instance.new(className)
-    for k, v in pairs(properties) do obj[k] = v end
-    if corner then 
-        local uiCorner = Instance.new("UICorner", obj)
-        uiCorner.CornerRadius = UDim.new(0, corner)
-    end
-    if stroke then
-        local str = Instance.new("UIStroke", obj)
-        for k, v in pairs(stroke) do str[k] = v end
-    end
-    if parent then obj.Parent = parent end
-    return obj
+    local obj = Instance.new(className)
+    for k, v in pairs(properties) do obj[k] = v end
+    if corner then 
+        Instance.new("UICorner", obj).CornerRadius = UDim.new(0, corner)
+    end
+    if stroke then
+        local str = Instance.new("UIStroke", obj)
+        for k, v in pairs(stroke) do str[k] = v end
+    end
+    if parent then obj.Parent = parent end
+    return obj
 end
 
 local ID_BACK = "rbxassetid://107874661558482"
@@ -35,565 +30,488 @@ local ID_SUN = "rbxassetid://85337967115080"
 local ID_OPEN_EXT = "rbxassetid://125206663850588"
 local ID_OPEN_MINI = "rbxassetid://135311906628500"
 
-local Color_BG = Color3.fromRGB(10, 10, 10)
-local Color_Border = Color3.fromRGB(255, 255, 255)
-
 local ScreenGui = Create("ScreenGui", lp.PlayerGui, { 
-    Name = "TerminalServerGui", 
-    ResetOnSpawn = false 
+    Name = "TerminalServerGui", 
+    ResetOnSpawn = false 
 })
 
 local OpenBtn = Create("ImageButton", ScreenGui, {
-    Name = "ExternalToggleButton",
-    Size = UDim2.new(0, 50, 0, 50),
-    Position = UDim2.new(0, 20, 0.4, 0),
-    BackgroundTransparency = 1,
-    Image = ID_OPEN_EXT,
-    ZIndex = 50
+    Name = "ExternalToggleButton",
+    Size = UDim2.new(0, 65, 0, 65),
+    Position = UDim2.new(0, 20, 0.4, 0),
+    BackgroundTransparency = 1,
+    Image = ID_OPEN_EXT,
+    ZIndex = 50
 })
 
 local MainFrame = Create("Frame", ScreenGui, {
-    Name = "MainFrame",
-    Size = UDim2.new(0, 650, 0, 500),
-    Position = UDim2.new(0.5, -325, 0.5, -250),
-    BackgroundColor3 = Color_BG,
-    BorderSizePixel = 0,
-    ClipsDescendants = true,
-    Visible = true,
-    Active = true
-}, nil, { Color = Color_Border, Thickness = 2 })
+    Name = "MainFrame",
+    Size = UDim2.new(0, 520, 0, 400),
+    Position = UDim2.new(0.5, -260, 0.5, -200),
+    BackgroundColor3 = Color3.fromRGB(10, 10, 10),
+    BorderSizePixel = 0,
+    ClipsDescendants = true,
+    Visible = true
+}, nil, { Color = Color3.fromRGB(255, 255, 255), Thickness = 2 })
 
--- Símbolo Spawn ao Fundo
-local SunBg = Create("ImageLabel", MainFrame, {
-    Name = "BgSpawnSymbol",
-    Size = UDim2.new(0, 360, 0, 360),
-    AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    BackgroundTransparency = 1,
-    Image = ID_SUN,
-    ImageColor3 = Color3.fromRGB(120, 120, 120),
-    ImageTransparency = 0.65,
-    ZIndex = 1
+Create("ImageLabel", MainFrame, {
+    Name = "BgSpawnSymbol",
+    Size = UDim2.new(0, 290, 0, 290),
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.new(0.5, 0, 0.5, 0),
+    BackgroundTransparency = 1,
+    Image = ID_SUN,
+    ImageColor3 = Color3.fromRGB(120, 120, 120),
+    ImageTransparency = 0.65,
+    ZIndex = 1
 })
 
 local TitleBar = Create("Frame", MainFrame, { 
-    Size = UDim2.new(1, 0, 0, 45), 
-    BackgroundTransparency = 1, 
-    ZIndex = 10 
+    Size = UDim2.new(1, 0, 0, 40), 
+    BackgroundTransparency = 1, 
+    ZIndex = 10 
 })
 
-local BackBtn = Create("ImageButton", TitleBar, {
-    Name = "BackButton", 
-    Size = UDim2.new(0, 32, 0, 32), 
-    Position = UDim2.new(0, 10, 0, 7),
-    BackgroundTransparency = 1, 
-    Image = ID_BACK, 
-    ZIndex = 10
-})
+Create("ImageButton", TitleBar, {
+    Name = "BackButton", 
+    Size = UDim2.new(0, 28, 0, 28), 
+    Position = UDim2.new(0, 10, 0.5, -14),
+    BackgroundTransparency = 1, 
+    Image = ID_BACK, 
+    ZIndex = 10
+}).MouseButton1Click:Connect(function()
+    RefreshServers()
+end)
 
-local OpenMiniBtn = Create("ImageButton", TitleBar, {
-    Name = "OpenIdInputBtn", 
-    Size = UDim2.new(0, 32, 0, 32), 
-    Position = UDim2.new(0, 48, 0, 7),
-    BackgroundTransparency = 1, 
-    Image = ID_OPEN_MINI, 
-    ZIndex = 10
+Create("ImageButton", TitleBar, {
+    Name = "OpenIdInputBtn", 
+    Size = UDim2.new(0, 28, 0, 28), 
+    Position = UDim2.new(0, 44, 0.5, -14),
+    BackgroundTransparency = 1, 
+    Image = ID_OPEN_MINI, 
+    ZIndex = 10
 })
 
 Create("TextLabel", TitleBar, {
-    Size = UDim2.new(1, -160, 1, 0), 
-    Position = UDim2.new(0, 80, 0, 0), 
-    BackgroundTransparency = 1,
-    Font = Enum.Font.Arcade, 
-    Text = "JOIN SERVER SPWNCUB", 
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 22, 
-    ZIndex = 10
+    Size = UDim2.new(1, -140, 1, 0), 
+    Position = UDim2.new(0, 70, 0, 0), 
+    BackgroundTransparency = 1,
+    Font = Enum.Font.Arcade, 
+    Text = "JOIN SERVER SPWNCUB", 
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 18, 
+    ZIndex = 10
 })
 
-local CloseMainBtn = Create("ImageButton", TitleBar, {
-    Name = "CloseButton", 
-    Size = UDim2.new(0, 32, 0, 32), 
-    Position = UDim2.new(1, -42, 0, 7),
-    BackgroundTransparency = 1, 
-    Image = ID_CLOSE_X, 
-    ZIndex = 10
-})
+Create("ImageButton", TitleBar, {
+    Name = "CloseButton", 
+    Size = UDim2.new(0, 28, 0, 28), 
+    Position = UDim2.new(1, -38, 0.5, -14),
+    BackgroundTransparency = 1, 
+    Image = ID_CLOSE_X, 
+    ZIndex = 10
+}).MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
 
--- Linha divisória
 Create("Frame", MainFrame, {
-    Size = UDim2.new(1, 0, 0, 1), 
-    Position = UDim2.new(0, 0, 0, 45),
-    BackgroundColor3 = Color3.fromRGB(60, 60, 60), 
-    BorderSizePixel = 0, 
-    ZIndex = 10
+    Size = UDim2.new(1, 0, 0, 1), 
+    Position = UDim2.new(0, 0, 0, 40),
+    BackgroundColor3 = Color3.fromRGB(60, 60, 60), 
+    BorderSizePixel = 0, 
+    ZIndex = 10
 })
 
 local ScrollContainer = Create("ScrollingFrame", MainFrame, {
-    Name = "ServerList", 
-    Size = UDim2.new(1, -10, 1, -50), 
-    Position = UDim2.new(0, 5, 0, 48),
-    BackgroundTransparency = 1, 
-    BorderSizePixel = 0, 
-    CanvasSize = UDim2.new(0, 0, 0, 500),
-    ScrollBarThickness = 4, 
-    ScrollBarImageColor3 = Color3.fromRGB(150, 150, 150), 
-    ZIndex = 5
+    Name = "ServerList", 
+    Size = UDim2.new(1, -10, 1, -45), 
+    Position = UDim2.new(0, 5, 0, 43),
+    BackgroundTransparency = 1, 
+    BorderSizePixel = 0, 
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    ScrollBarThickness = 4, 
+    ScrollBarImageColor3 = Color3.fromRGB(150, 150, 150), 
+    ZIndex = 5
 })
 
-local ScrollLayout = Create("UIListLayout", ScrollContainer, { 
-    SortOrder = Enum.SortOrder.LayoutOrder 
+Create("UIListLayout", ScrollContainer, { 
+    SortOrder = Enum.SortOrder.LayoutOrder 
 })
 
 local MiniPopUp = Create("Frame", MainFrame, {
-    Name = "MiniPopUp", 
-    Size = UDim2.new(0, 500, 0, 230), 
-    Position = UDim2.new(0.5, -250, 0.5, -115),
-    BackgroundColor3 = Color3.fromRGB(15, 15, 15), 
-    BorderSizePixel = 0, 
-    ZIndex = 30, 
-    Visible = false
-}, nil, { Color = Color_Border, Thickness = 2 })
+    Name = "MiniPopUp", 
+    Size = UDim2.new(0, 420, 0, 190), 
+    Position = UDim2.new(0.5, -210, 0.5, -95),
+    BackgroundColor3 = Color3.fromRGB(15, 15, 15), 
+    BorderSizePixel = 0, 
+    ZIndex = 30, 
+    Visible = false
+}, nil, { Color = Color3.fromRGB(255, 255, 255), Thickness = 2 })
 
-local MiniCloseBtn = Create("ImageButton", MiniPopUp, {
-    Name = "MiniCloseBtn", 
-    Size = UDim2.new(0, 30, 0, 30), 
-    Position = UDim2.new(1, -38, 0, 8),
-    BackgroundTransparency = 1, 
-    Image = ID_CLOSE_X, 
-    ZIndex = 32
-})
+Create("ImageButton", MiniPopUp, {
+    Name = "MiniCloseBtn", 
+    Size = UDim2.new(0, 26, 0, 26), 
+    Position = UDim2.new(1, -34, 0, 8),
+    BackgroundTransparency = 1, 
+    Image = ID_CLOSE_X, 
+    ZIndex = 32
+}).MouseButton1Click:Connect(function()
+    MiniPopUp.Visible = false
+end)
 
--- Texto de instrução
 Create("TextLabel", MiniPopUp, {
-    Size = UDim2.new(1, -50, 0, 45), 
-    Position = UDim2.new(0, 10, 0, 10), 
-    BackgroundTransparency = 1,
-    Font = Enum.Font.Arcade, 
-    Text = "Cole o ID do Servidor abaixo para entrar:",
-    TextColor3 = Color3.fromRGB(255, 255, 255), 
-    TextSize = 16, 
-    ZIndex = 31,
-    TextXAlignment = Enum.TextXAlignment.Left
+    Size = UDim2.new(1, -50, 0, 38), 
+    Position = UDim2.new(0, 10, 0, 10), 
+    BackgroundTransparency = 1,
+    Font = Enum.Font.Arcade, 
+    Text = "Cole o ID do Servidor abaixo para entrar:",
+    TextColor3 = Color3.fromRGB(255, 255, 255), 
+    TextSize = 14, 
+    ZIndex = 31,
+    TextXAlignment = Enum.TextXAlignment.Left
 })
 
--- Caixa de pesquisa com scrolling para IDs longos
 local InputPill = Create("Frame", MiniPopUp, {
-    Size = UDim2.new(0.9, 0, 0, 40),
-    Position = UDim2.new(0.05, 0, 0, 70),
-    BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
-    BorderSizePixel = 0, 
-    ZIndex = 31
+    Size = UDim2.new(0.9, 0, 0, 34),
+    Position = UDim2.new(0.05, 0, 0, 58),
+    BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
+    BorderSizePixel = 0, 
+    ZIndex = 31
 }, 16)
 
--- ScrollingFrame interno para texto longo
 local textScrollFrame = Create("ScrollingFrame", InputPill, {
-    Size = UDim2.new(1, -20, 1, -4),
-    Position = UDim2.new(0, 10, 0, 2),
-    BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    ScrollBarThickness = 4,
-    ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100),
-    ScrollBarImageTransparency = 0.5,
-    ZIndex = 32,
-    ClipsDescendants = true,
-    HorizontalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
-    VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+    Size = UDim2.new(1, -20, 1, -4),
+    Position = UDim2.new(0, 10, 0, 2),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    ScrollBarThickness = 3,
+    ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100),
+    ScrollBarImageTransparency = 0.5,
+    ZIndex = 32,
+    ClipsDescendants = true,
+    HorizontalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
+    VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
 })
 
 local MiniTextBox = Create("TextBox", textScrollFrame, {
-    Size = UDim2.new(1, 0, 1, 0),
-    Position = UDim2.new(0, 0, 0, 0),
-    BackgroundTransparency = 1,
-    Font = Enum.Font.SourceSans,
-    Text = "",
-    PlaceholderText = "Ex: 59b5b7da-4c7b-4436-8562-cad4f887814b",
-    PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
-    TextColor3 = Color3.fromRGB(0, 0, 0),
-    TextSize = 15,
-    ZIndex = 33,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-    ClearTextOnFocus = false
+    Size = UDim2.new(1, 0, 1, 0),
+    Position = UDim2.new(0, 0, 0, 0),
+    BackgroundTransparency = 1,
+    Font = Enum.Font.SourceSans,
+    Text = "",
+    PlaceholderText = "Ex: 59b5b7da-4c7b-4436-8562-cad4f887814b",
+    PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
+    TextColor3 = Color3.fromRGB(0, 0, 0),
+    TextSize = 14,
+    ZIndex = 33,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    ClearTextOnFocus = false
 })
 
--- Ajusta o CanvasSize do ScrollingFrame quando o texto muda
 local function updateTextScroll()
-    local textLength = #MiniTextBox.Text
-    local charWidth = 8.5  -- Aproximadamente 8.5 pixels por caractere na fonte SourceSans tamanho 15
-    local textWidth = textLength * charWidth + 30
-    local padding = 20
-    local frameWidth = textScrollFrame.AbsoluteSize.X - padding
-    
-    if textWidth > frameWidth and frameWidth > 0 then
-        textScrollFrame.CanvasSize = UDim2.new(0, textWidth + padding, 0, 0)
-    else
-        textScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    end
+    local textLength = #MiniTextBox.Text
+    local charWidth = 8
+    local textWidth = textLength * charWidth + 30
+    local padding = 20
+    local frameWidth = textScrollFrame.AbsoluteSize.X - padding
+    
+    if textWidth > frameWidth and frameWidth > 0 then
+        textScrollFrame.CanvasSize = UDim2.new(0, textWidth + padding, 0, 0)
+    else
+        textScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    end
 end
 
 MiniTextBox:GetPropertyChangedSignal("Text"):Connect(updateTextScroll)
-
--- Também ajusta quando a interface é redimensionada
 MiniPopUp:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-    task.wait(0.1)
-    updateTextScroll()
-end)
-
--- Ajusta quando o pop-up fica visível
-MiniPopUp:GetPropertyChangedSignal("Visible"):Connect(function()
-    if MiniPopUp.Visible then
-        task.wait(0.1)
-        updateTextScroll()
-        MiniTextBox:CaptureFocus()
-    end
+    task.wait(0.1)
+    updateTextScroll()
 end)
 
 Create("ImageLabel", MiniPopUp, {
-    Size = UDim2.new(0, 50, 0, 50), 
-    Position = UDim2.new(0, 15, 1, -65),
-    BackgroundTransparency = 1, 
-    Image = ID_SUN, 
-    ZIndex = 31
+    Size = UDim2.new(0, 40, 0, 40), 
+    Position = UDim2.new(0, 12, 1, -52),
+    BackgroundTransparency = 1, 
+    Image = ID_SUN, 
+    ZIndex = 31
 })
 
 Create("ImageLabel", MiniPopUp, {
-    Size = UDim2.new(0, 50, 0, 50), 
-    Position = UDim2.new(1, -65, 1, -65),
-    BackgroundTransparency = 1, 
-    Image = ID_SUN, 
-    ZIndex = 31
+    Size = UDim2.new(0, 40, 0, 40), 
+    Position = UDim2.new(1, -52, 1, -52),
+    BackgroundTransparency = 1, 
+    Image = ID_SUN, 
+    ZIndex = 31
 })
 
--- Botão "Join Link Server"
 local JoinLinkBtn = Create("TextButton", MiniPopUp, {
-    Size = UDim2.new(0, 220, 0, 38),
-    Position = UDim2.new(0.5, -110, 1, -52),
-    BackgroundColor3 = Color3.fromRGB(25, 25, 25), 
-    Font = Enum.Font.Arcade, 
-    Text = "▶ JOIN LINK SERVER",
-    TextColor3 = Color3.fromRGB(255, 255, 255), 
-    TextSize = 16, 
-    ZIndex = 32
+    Size = UDim2.new(0, 190, 0, 34),
+    Position = UDim2.new(0.5, -95, 1, -44),
+    BackgroundColor3 = Color3.fromRGB(25, 25, 25), 
+    Font = Enum.Font.Arcade, 
+    Text = "▶ JOIN LINK SERVER",
+    TextColor3 = Color3.fromRGB(255, 255, 255), 
+    TextSize = 14, 
+    ZIndex = 32
 }, nil, { Color = Color3.fromRGB(80, 80, 80), Thickness = 1 })
 
 function CreateServerSlot(server, index)
-    local Slot = Create("Frame", ScrollContainer, {
-        Size = UDim2.new(1, 0, 0, 120), 
-        BackgroundTransparency = 1, 
-        ZIndex = 5,
-        LayoutOrder = index
-    })
+    local Slot = Create("Frame", ScrollContainer, {
+        Size = UDim2.new(1, 0, 0, 105), 
+        BackgroundTransparency = 1, 
+        ZIndex = 5,
+        LayoutOrder = index
+    })
 
-    -- Dados do servidor
-    local playing = server.playing or 0
-    local maxPlayers = server.maxPlayers or 6
-    local ping = server.ping or math.random(20, 150)
-    local fps = ping > 0 and math.min(math.floor(1000 / ping), 60) or 0
-    local serverId = server.id or "N/A"
-    local gameId = game.PlaceId
+    local playing = server.playing or 0
+    local maxPlayers = server.maxPlayers or 6
+    local ping = server.ping or math.random(20, 150)
+    local fps = ping > 0 and math.min(math.floor(1000 / ping), 60) or 0
+    local serverId = server.id or "N/A"
 
-    -- Cor do ping
-    local pingColor
-    if ping < 60 then
-        pingColor = Color3.fromRGB(0, 255, 100)
-    elseif ping < 120 then
-        pingColor = Color3.fromRGB(255, 200, 50)
-    else
-        pingColor = Color3.fromRGB(255, 80, 80)
-    end
+    local pingColor
+    if ping < 60 then
+        pingColor = Color3.fromRGB(0, 255, 100)
+    elseif ping < 120 then
+        pingColor = Color3.fromRGB(255, 200, 50)
+    else
+        pingColor = Color3.fromRGB(255, 80, 80)
+    end
 
-    -- Texto das informações
-    local infoText = string.format(
-        "PING : %dms\nFPS : %d\nPLAYERS : %d/%d\n\nGAME ID : %d\nID : %s",
-        ping, fps, playing, maxPlayers, gameId, serverId
-    )
+    local infoText = string.format(
+        "PING : %dms\nFPS : %d\nPLAYERS : %d/%d\n\nGAME ID : %d\nID : %s",
+        ping, fps, playing, maxPlayers, game.PlaceId, serverId
+    )
 
-    -- Label de informações (esquerda)
-    local InfoLabel = Create("TextLabel", Slot, {
-        Size = UDim2.new(0.65, 0, 1, 0), 
-        Position = UDim2.new(0, 15, 0, 0), 
-        BackgroundTransparency = 1,
-        Font = Enum.Font.Arcade, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        TextYAlignment = Enum.TextYAlignment.Center,
-        Text = infoText,
-        TextColor3 = Color3.fromRGB(255, 255, 255), 
-        TextSize = 16, 
-        ZIndex = 6
-    })
+    local InfoLabel = Create("TextLabel", Slot, {
+        Size = UDim2.new(0.65, 0, 1, 0), 
+        Position = UDim2.new(0, 12, 0, 0), 
+        BackgroundTransparency = 1,
+        Font = Enum.Font.Arcade, 
+        TextXAlignment = Enum.TextXAlignment.Left, 
+        TextYAlignment = Enum.TextYAlignment.Center,
+        Text = infoText,
+        TextColor3 = Color3.fromRGB(255, 255, 255), 
+        TextSize = 14, 
+        ZIndex = 6
+    })
 
-    -- Atualiza a cor do PING no texto
-    local function updatePingColor()
-        local text = InfoLabel.Text
-        local lines = {}
-        for line in text:gmatch("[^\n]+") do
-            table.insert(lines, line)
-        end
-        if #lines >= 1 then
-            lines[1] = string.format('<font color="rgb(%d,%d,%d)">PING : %dms</font>', 
-                pingColor.R * 255, pingColor.G * 255, pingColor.B * 255, ping)
-            InfoLabel.Text = table.concat(lines, "\n")
-            InfoLabel.RichText = true
-        end
-    end
-    updatePingColor()
+    local lines = {}
+    for line in infoText:gmatch("[^\n]+") do
+        table.insert(lines, line)
+    end
+    if #lines >= 1 then
+        lines[1] = string.format('<font color="rgb(%d,%d,%d)">PING : %dms</font>', 
+            pingColor.R * 255, pingColor.G * 255, pingColor.B * 255, ping)
+        InfoLabel.Text = table.concat(lines, "\n")
+        InfoLabel.RichText = true
+    end
 
-    -- Botão JOIN
-    local JoinButton = Create("TextButton", Slot, {
-        Name = "JoinButton", 
-        Size = UDim2.new(0, 110, 0, 32), 
-        Position = UDim2.new(1, -125, 0, 20),
-        BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
-        Font = Enum.Font.Arcade, 
-        Text = "JOIN",
-        TextColor3 = Color3.fromRGB(255, 255, 255), 
-        TextSize = 16, 
-        ZIndex = 6
-    }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
+    local JoinButton = Create("TextButton", Slot, {
+        Name = "JoinButton", 
+        Size = UDim2.new(0, 95, 0, 28), 
+        Position = UDim2.new(1, -108, 0, 16),
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
+        Font = Enum.Font.Arcade, 
+        Text = "JOIN",
+        TextColor3 = Color3.fromRGB(255, 255, 255), 
+        TextSize = 14, 
+        ZIndex = 6
+    }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
 
-    JoinButton.MouseButton1Click:Connect(function()
-        local success, err = pcall(function()
-            TeleportService:TeleportToPlaceInstance(gameId, serverId, lp)
-        end)
-        if not success then
-            warn("Erro ao entrar no servidor:", err)
-        end
-    end)
+    JoinButton.MouseButton1Click:Connect(function()
+        pcall(function()
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, serverId, lp)
+        end)
+    end)
 
-    -- Botão COPY JOIN
-    local CopyButton = Create("TextButton", Slot, {
-        Name = "CopyButton", 
-        Size = UDim2.new(0, 110, 0, 32), 
-        Position = UDim2.new(1, -125, 0, 62),
-        BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
-        Font = Enum.Font.Arcade, 
-        Text = "COPY JOIN",
-        TextColor3 = Color3.fromRGB(255, 255, 255), 
-        TextSize = 14, 
-        ZIndex = 6
-    }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
+    local CopyButton = Create("TextButton", Slot, {
+        Name = "CopyButton", 
+        Size = UDim2.new(0, 95, 0, 28), 
+        Position = UDim2.new(1, -108, 0, 54),
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
+        Font = Enum.Font.Arcade, 
+        Text = "COPY JOIN",
+        TextColor3 = Color3.fromRGB(255, 255, 255), 
+        TextSize = 12, 
+        ZIndex = 6
+    }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
 
-    CopyButton.MouseButton1Click:Connect(function()
-        local cmd = 'Roblox.GameLauncher.joinGameInstance(' .. gameId .. ', "' .. serverId .. '")'
-        if Clipboard then
-            Clipboard(cmd)
-            print("✅ Comando copiado para o servidor:", serverId)
-        else
-            warn("❌ Clipboard não suportado pelo seu exploit")
-        end
-    end)
+    CopyButton.MouseButton1Click:Connect(function()
+        if Clipboard then
+            Clipboard('Roblox.GameLauncher.joinGameInstance(' .. game.PlaceId .. ', "' .. serverId .. '")')
+        end
+    end)
 
-    -- Linha divisória
-    Create("Frame", Slot, {
-        Size = UDim2.new(1, -20, 0, 1), 
-        Position = UDim2.new(0, 10, 1, -1),
-        BackgroundColor3 = Color3.fromRGB(40, 40, 40), 
-        BorderSizePixel = 0, 
-        ZIndex = 6
-    })
+    Create("Frame", Slot, {
+        Size = UDim2.new(1, -20, 0, 1), 
+        Position = UDim2.new(0, 10, 1, -1),
+        BackgroundColor3 = Color3.fromRGB(40, 40, 40), 
+        BorderSizePixel = 0, 
+        ZIndex = 6
+    })
 
-    table.insert(serverFrames, Slot)
-    return Slot
+    table.insert(serverFrames, Slot)
+    return Slot
 end
 
 function GetAllServers(placeId)
-    local servers = {}
-    
-    local success, result = pcall(function()
-        local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
-        local data = HttpService:JSONDecode(game:HttpGet(url))
-        
-        if data and data.data then
-            for _, server in ipairs(data.data) do
-                table.insert(servers, server)
-            end
-        end
-        
-        local cursor = data.nextPageCursor
-        while cursor and #servers < 100 do
-            local nextUrl = url .. "&cursor=" .. cursor
-            local nextData = HttpService:JSONDecode(game:HttpGet(nextUrl))
-            if nextData and nextData.data then
-                for _, server in ipairs(nextData.data) do
-                    table.insert(servers, server)
-                end
-            end
-            cursor = nextData.nextPageCursor
-        end
-    end)
-    
-    if not success then
-        warn("Erro ao buscar servidores:", result)
-        return {}
-    end
-    
-    return servers
+    local servers = {}
+    
+    pcall(function()
+        local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
+        local data = HttpService:JSONDecode(game:HttpGet(url))
+        
+        if data and data.data then
+            for _, server in ipairs(data.data) do
+                table.insert(servers, server)
+            end
+        end
+        
+        local cursor = data.nextPageCursor
+        while cursor and #servers < 100 do
+            local nextUrl = url .. "&cursor=" .. cursor
+            local nextData = HttpService:JSONDecode(game:HttpGet(nextUrl))
+            if nextData and nextData.data then
+                for _, server in ipairs(nextData.data) do
+                    table.insert(servers, server)
+                end
+            end
+            cursor = nextData.nextPageCursor
+        end
+    end)
+    
+    return servers
 end
 
 function UpdateServerList(servers)
-    -- Limpa frames antigos
-    for _, frame in ipairs(serverFrames) do
-        frame:Destroy()
-    end
-    serverFrames = {}
-    
-    if #servers == 0 then
-        local empty = Create("TextLabel", ScrollContainer, {
-            Size = UDim2.new(1, 0, 0, 60),
-            BackgroundTransparency = 1,
-            Font = Enum.Font.Arcade,
-            Text = "❌ NENHUM SERVIDOR ENCONTRADO",
-            TextColor3 = Color3.fromRGB(200, 200, 200),
-            TextSize = 20,
-            ZIndex = 5,
-            LayoutOrder = 1
-        })
-        ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 60)
-        return
-    end
-    
-    -- Ordena por ping (menor primeiro)
-    table.sort(servers, function(a, b)
-        return (a.ping or 999) < (b.ping or 999)
-    end)
-    
-    -- Limita a 50 servidores
-    if #servers > 50 then
-        for i = #servers, 51, -1 do
-            table.remove(servers, i)
-        end
-    end
-    
-    -- Cria os cards
-    for i, server in ipairs(servers) do
-        CreateServerSlot(server, i)
-    end
-    
-    -- Atualiza o canvas
-    local totalHeight = #serverFrames * 125
-    ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+    for _, frame in ipairs(serverFrames) do
+        frame:Destroy()
+    end
+    serverFrames = {}
+    
+    if #servers == 0 then
+        ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+        return
+    end
+    
+    table.sort(servers, function(a, b)
+        return (a.ping or 999) < (b.ping or 999)
+    end)
+    
+    if #servers > 50 then
+        for i = #servers, 51, -1 do
+            table.remove(servers, i)
+        end
+    end
+    
+    for i, server in ipairs(servers) do
+        CreateServerSlot(server, i)
+    end
+    
+    ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, #serverFrames * 110)
 end
 
 function RefreshServers()
-    if isRefreshing then return end
-    isRefreshing = true
-    
-    print("🔄 Atualizando lista de servidores...")
-    
-    task.spawn(function()
-        local servers = GetAllServers(game.PlaceId)
-        UpdateServerList(servers)
-        print("✅ " .. #servers .. " servidores encontrados!")
-        isRefreshing = false
-    end)
+    if isRefreshing then return end
+    isRefreshing = true
+    
+    task.spawn(function()
+        UpdateServerList(GetAllServers(game.PlaceId))
+        isRefreshing = false
+    end)
 end
 
 local function makeDraggable(obj)
-    local dragging, dragStart, startPos
-    
-    obj.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
-           input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = obj.Position
-            
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    
-    UIS.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or 
-                         input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            obj.Position = UDim2.new(
-                startPos.X.Scale, 
-                startPos.X.Offset + delta.X, 
-                startPos.Y.Scale, 
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    local isDragging = false
+    
+    obj.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            isDragging = false
+            dragStart = input.Position
+            startPos = obj.Position
+        end
+    end)
+    
+    obj.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+            isDragging = false
+        end
+    end)
+    
+    UIS.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or 
+                         input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            if not isDragging then
+                isDragging = true
+            end
+            obj.Position = UDim2.new(
+                startPos.X.Scale, 
+                startPos.X.Offset + delta.X, 
+                startPos.Y.Scale, 
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
 end
 
 makeDraggable(MainFrame)
 makeDraggable(OpenBtn)
 
--- Botão externo (abrir/fechar)
 OpenBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
+    MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Fechar completamente
-CloseMainBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
+local openMiniBtn = TitleBar:FindFirstChild("OpenIdInputBtn")
+if openMiniBtn then
+    openMiniBtn.MouseButton1Click:Connect(function()
+        MiniPopUp.Visible = not MiniPopUp.Visible
+        if MiniPopUp.Visible then
+            MiniTextBox.Text = ""
+            MiniTextBox:CaptureFocus()
+            task.wait(0.1)
+            updateTextScroll()
+        end
+    end)
+end
 
--- Back = Refresh (Atualizar)
-BackBtn.MouseButton1Click:Connect(function()
-    RefreshServers()
-end)
-
--- Alternar Mini-Interface
-OpenMiniBtn.MouseButton1Click:Connect(function()
-    MiniPopUp.Visible = not MiniPopUp.Visible
-    if MiniPopUp.Visible then
-        MiniTextBox.Text = ""
-        MiniTextBox:CaptureFocus()
-        task.wait(0.1)
-        updateTextScroll()
-    end
-end)
-
-MiniCloseBtn.MouseButton1Click:Connect(function()
-    MiniPopUp.Visible = false
-end)
-
--- Botão "Join Link Server" - entra pelo ID
 JoinLinkBtn.MouseButton1Click:Connect(function()
-    local enteredText = MiniTextBox.Text:match("^%s*(.-)%s*$")
-    
-    if enteredText and #enteredText > 0 then
-        print("🔗 Tentando entrar no servidor com ID:", enteredText)
-        
-        local success, err = pcall(function()
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, enteredText, lp)
-        end)
-        
-        if not success then
-            warn("❌ Erro ao entrar pelo ID:", err)
-            MiniTextBox.Text = "❌ ID inválido! Tente novamente."
-            MiniTextBox.TextColor3 = Color3.fromRGB(255, 50, 50)
-            task.wait(2)
-            MiniTextBox.Text = ""
-            MiniTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-        else
-            MiniPopUp.Visible = false
-        end
-    else
-        MiniTextBox.Text = "❌ Digite um ID válido!"
-        MiniTextBox.TextColor3 = Color3.fromRGB(255, 50, 50)
-        task.wait(2)
-        MiniTextBox.Text = ""
-        MiniTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-    end
+    local enteredText = MiniTextBox.Text:match("^%s*(.-)%s*$")
+    
+    if enteredText and #enteredText > 0 then
+        pcall(function()
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, enteredText, lp)
+        end)
+        MiniPopUp.Visible = false
+    else
+        MiniTextBox.Text = "Digite um ID válido!"
+        MiniTextBox.TextColor3 = Color3.fromRGB(255, 50, 50)
+        task.wait(1.5)
+        MiniTextBox.Text = ""
+        MiniTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+    end
 end)
 
--- Enter para enviar
 MiniTextBox.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        JoinLinkBtn.MouseButton1Click:Fire()
-    end
+    if enterPressed then
+        JoinLinkBtn.MouseButton1Click:Fire()
+    end
 end)
 
 UIS.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.Escape then
-        MainFrame.Visible = not MainFrame.Visible
-    end
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Escape then
+        MainFrame.Visible = not MainFrame.Visible
+    end
 end)
+
+RefreshServers()
