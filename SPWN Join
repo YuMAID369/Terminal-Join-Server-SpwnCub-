@@ -37,8 +37,8 @@ local ScreenGui = Create("ScreenGui", lp.PlayerGui, {
 
 local OpenBtn = Create("ImageButton", ScreenGui, {
     Name = "ExternalToggleButton",
-    Size = UDim2.new(0, 65, 0, 65),
-    Position = UDim2.new(0, 20, 0.4, 0),
+    Size = UDim2.new(0, 45, 0, 45),
+    Position = UDim2.new(0, 10, 0.4, 0),
     BackgroundTransparency = 1,
     Image = ID_OPEN_EXT,
     ZIndex = 50
@@ -46,17 +46,17 @@ local OpenBtn = Create("ImageButton", ScreenGui, {
 
 local MainFrame = Create("Frame", ScreenGui, {
     Name = "MainFrame",
-    Size = UDim2.new(0, 520, 0, 400),
-    Position = UDim2.new(0.5, -260, 0.5, -200),
+    Size = UDim2.new(0, 312, 0, 240),
+    Position = UDim2.new(0.5, -156, 0.5, -120),
     BackgroundColor3 = Color3.fromRGB(10, 10, 10),
     BorderSizePixel = 0,
     ClipsDescendants = true,
     Visible = true
-}, nil, { Color = Color3.fromRGB(255, 255, 255), Thickness = 2 })
+}, nil, { Color = Color3.fromRGB(255, 255, 255), Thickness = 1.5 })
 
 Create("ImageLabel", MainFrame, {
     Name = "BgSpawnSymbol",
-    Size = UDim2.new(0, 290, 0, 290),
+    Size = UDim2.new(0, 174, 0, 174),
     AnchorPoint = Vector2.new(0.5, 0.5),
     Position = UDim2.new(0.5, 0, 0.5, 0),
     BackgroundTransparency = 1,
@@ -67,15 +67,15 @@ Create("ImageLabel", MainFrame, {
 })
 
 local TitleBar = Create("Frame", MainFrame, { 
-    Size = UDim2.new(1, 0, 0, 40), 
+    Size = UDim2.new(1, 0, 0, 28), 
     BackgroundTransparency = 1, 
     ZIndex = 10 
 })
 
 Create("ImageButton", TitleBar, {
     Name = "BackButton", 
-    Size = UDim2.new(0, 28, 0, 28), 
-    Position = UDim2.new(0, 10, 0.5, -14),
+    Size = UDim2.new(0, 20, 0, 20), 
+    Position = UDim2.new(0, 6, 0.5, -10),
     BackgroundTransparency = 1, 
     Image = ID_BACK, 
     ZIndex = 10
@@ -85,28 +85,28 @@ end)
 
 Create("ImageButton", TitleBar, {
     Name = "OpenIdInputBtn", 
-    Size = UDim2.new(0, 28, 0, 28), 
-    Position = UDim2.new(0, 44, 0.5, -14),
+    Size = UDim2.new(0, 20, 0, 20), 
+    Position = UDim2.new(0, 30, 0.5, -10),
     BackgroundTransparency = 1, 
     Image = ID_OPEN_MINI, 
     ZIndex = 10
 })
 
 Create("TextLabel", TitleBar, {
-    Size = UDim2.new(1, -140, 1, 0), 
-    Position = UDim2.new(0, 70, 0, 0), 
+    Size = UDim2.new(1, -100, 1, 0), 
+    Position = UDim2.new(0, 50, 0, 0), 
     BackgroundTransparency = 1,
     Font = Enum.Font.Arcade, 
-    Text = "JOIN SERVER SPWNCUB", 
+    Text = "JOIN SPWNCUB", 
     TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 18, 
+    TextSize = 13, 
     ZIndex = 10
 })
 
 Create("ImageButton", TitleBar, {
     Name = "CloseButton", 
-    Size = UDim2.new(0, 28, 0, 28), 
-    Position = UDim2.new(1, -38, 0.5, -14),
+    Size = UDim2.new(0, 20, 0, 20), 
+    Position = UDim2.new(1, -26, 0.5, -10),
     BackgroundTransparency = 1, 
     Image = ID_CLOSE_X, 
     ZIndex = 10
@@ -116,7 +116,7 @@ end)
 
 Create("Frame", MainFrame, {
     Size = UDim2.new(1, 0, 0, 1), 
-    Position = UDim2.new(0, 0, 0, 40),
+    Position = UDim2.new(0, 0, 0, 28),
     BackgroundColor3 = Color3.fromRGB(60, 60, 60), 
     BorderSizePixel = 0, 
     ZIndex = 10
@@ -124,12 +124,12 @@ Create("Frame", MainFrame, {
 
 local ScrollContainer = Create("ScrollingFrame", MainFrame, {
     Name = "ServerList", 
-    Size = UDim2.new(1, -10, 1, -45), 
-    Position = UDim2.new(0, 5, 0, 43),
+    Size = UDim2.new(1, -6, 1, -32), 
+    Position = UDim2.new(0, 3, 0, 30),
     BackgroundTransparency = 1, 
     BorderSizePixel = 0, 
     CanvasSize = UDim2.new(0, 0, 0, 0),
-    ScrollBarThickness = 4, 
+    ScrollBarThickness = 3, 
     ScrollBarImageColor3 = Color3.fromRGB(150, 150, 150), 
     ZIndex = 5
 })
@@ -140,18 +140,18 @@ Create("UIListLayout", ScrollContainer, {
 
 local MiniPopUp = Create("Frame", MainFrame, {
     Name = "MiniPopUp", 
-    Size = UDim2.new(0, 420, 0, 190), 
-    Position = UDim2.new(0.5, -210, 0.5, -95),
+    Size = UDim2.new(0, 270, 0, 130), 
+    Position = UDim2.new(0.5, -135, 0.5, -65),
     BackgroundColor3 = Color3.fromRGB(15, 15, 15), 
     BorderSizePixel = 0, 
     ZIndex = 30, 
     Visible = false
-}, nil, { Color = Color3.fromRGB(255, 255, 255), Thickness = 2 })
+}, nil, { Color = Color3.fromRGB(255, 255, 255), Thickness = 1.5 })
 
 Create("ImageButton", MiniPopUp, {
     Name = "MiniCloseBtn", 
-    Size = UDim2.new(0, 26, 0, 26), 
-    Position = UDim2.new(1, -34, 0, 8),
+    Size = UDim2.new(0, 18, 0, 18), 
+    Position = UDim2.new(1, -24, 0, 5),
     BackgroundTransparency = 1, 
     Image = ID_CLOSE_X, 
     ZIndex = 32
@@ -160,31 +160,31 @@ Create("ImageButton", MiniPopUp, {
 end)
 
 Create("TextLabel", MiniPopUp, {
-    Size = UDim2.new(1, -50, 0, 38), 
-    Position = UDim2.new(0, 10, 0, 10), 
+    Size = UDim2.new(1, -40, 0, 28), 
+    Position = UDim2.new(0, 8, 0, 6), 
     BackgroundTransparency = 1,
     Font = Enum.Font.Arcade, 
-    Text = "Cole o ID do Servidor abaixo para entrar:",
+    Text = "Cole o ID abaixo:",
     TextColor3 = Color3.fromRGB(255, 255, 255), 
-    TextSize = 14, 
+    TextSize = 11, 
     ZIndex = 31,
     TextXAlignment = Enum.TextXAlignment.Left
 })
 
 local InputPill = Create("Frame", MiniPopUp, {
-    Size = UDim2.new(0.9, 0, 0, 34),
-    Position = UDim2.new(0.05, 0, 0, 58),
+    Size = UDim2.new(0.9, 0, 0, 26),
+    Position = UDim2.new(0.05, 0, 0, 40),
     BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
     BorderSizePixel = 0, 
     ZIndex = 31
-}, 16)
+}, 12)
 
 local textScrollFrame = Create("ScrollingFrame", InputPill, {
-    Size = UDim2.new(1, -20, 1, -4),
-    Position = UDim2.new(0, 10, 0, 2),
+    Size = UDim2.new(1, -14, 1, -4),
+    Position = UDim2.new(0, 7, 0, 2),
     BackgroundTransparency = 1,
     BorderSizePixel = 0,
-    ScrollBarThickness = 3,
+    ScrollBarThickness = 2,
     ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100),
     ScrollBarImageTransparency = 0.5,
     ZIndex = 32,
@@ -199,10 +199,10 @@ local MiniTextBox = Create("TextBox", textScrollFrame, {
     BackgroundTransparency = 1,
     Font = Enum.Font.SourceSans,
     Text = "",
-    PlaceholderText = "Ex: 59b5b7da-4c7b-4436-8562-cad4f887814b",
+    PlaceholderText = "ID: 59b5b7da...",
     PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
     TextColor3 = Color3.fromRGB(0, 0, 0),
-    TextSize = 14,
+    TextSize = 12,
     ZIndex = 33,
     TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Center,
@@ -211,9 +211,9 @@ local MiniTextBox = Create("TextBox", textScrollFrame, {
 
 local function updateTextScroll()
     local textLength = #MiniTextBox.Text
-    local charWidth = 8
-    local textWidth = textLength * charWidth + 30
-    local padding = 20
+    local charWidth = 7
+    local textWidth = textLength * charWidth + 20
+    local padding = 14
     local frameWidth = textScrollFrame.AbsoluteSize.X - padding
     
     if textWidth > frameWidth and frameWidth > 0 then
@@ -230,35 +230,35 @@ MiniPopUp:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 end)
 
 Create("ImageLabel", MiniPopUp, {
-    Size = UDim2.new(0, 40, 0, 40), 
-    Position = UDim2.new(0, 12, 1, -52),
+    Size = UDim2.new(0, 28, 0, 28), 
+    Position = UDim2.new(0, 8, 1, -36),
     BackgroundTransparency = 1, 
     Image = ID_SUN, 
     ZIndex = 31
 })
 
 Create("ImageLabel", MiniPopUp, {
-    Size = UDim2.new(0, 40, 0, 40), 
-    Position = UDim2.new(1, -52, 1, -52),
+    Size = UDim2.new(0, 28, 0, 28), 
+    Position = UDim2.new(1, -36, 1, -36),
     BackgroundTransparency = 1, 
     Image = ID_SUN, 
     ZIndex = 31
 })
 
 local JoinLinkBtn = Create("TextButton", MiniPopUp, {
-    Size = UDim2.new(0, 190, 0, 34),
-    Position = UDim2.new(0.5, -95, 1, -44),
+    Size = UDim2.new(0, 130, 0, 26),
+    Position = UDim2.new(0.5, -65, 1, -30),
     BackgroundColor3 = Color3.fromRGB(25, 25, 25), 
     Font = Enum.Font.Arcade, 
-    Text = "▶ JOIN LINK SERVER",
+    Text = "▶ JOIN",
     TextColor3 = Color3.fromRGB(255, 255, 255), 
-    TextSize = 14, 
+    TextSize = 12, 
     ZIndex = 32
 }, nil, { Color = Color3.fromRGB(80, 80, 80), Thickness = 1 })
 
 function CreateServerSlot(server, index)
     local Slot = Create("Frame", ScrollContainer, {
-        Size = UDim2.new(1, 0, 0, 105), 
+        Size = UDim2.new(1, 0, 0, 76), 
         BackgroundTransparency = 1, 
         ZIndex = 5,
         LayoutOrder = index
@@ -280,20 +280,20 @@ function CreateServerSlot(server, index)
     end
 
     local infoText = string.format(
-        "PING : %dms\nFPS : %d\nPLAYERS : %d/%d\n\nGAME ID : %d\nID : %s",
+        "PING : %dms\nFPS : %d\nPLAYERS : %d/%d\nGAME ID : %d\nID : %s",
         ping, fps, playing, maxPlayers, game.PlaceId, serverId
     )
 
     local InfoLabel = Create("TextLabel", Slot, {
-        Size = UDim2.new(0.65, 0, 1, 0), 
-        Position = UDim2.new(0, 12, 0, 0), 
+        Size = UDim2.new(0.6, 0, 1, 0), 
+        Position = UDim2.new(0, 8, 0, 0), 
         BackgroundTransparency = 1,
         Font = Enum.Font.Arcade, 
         TextXAlignment = Enum.TextXAlignment.Left, 
         TextYAlignment = Enum.TextYAlignment.Center,
         Text = infoText,
         TextColor3 = Color3.fromRGB(255, 255, 255), 
-        TextSize = 14, 
+        TextSize = 10, 
         ZIndex = 6
     })
 
@@ -310,13 +310,13 @@ function CreateServerSlot(server, index)
 
     local JoinButton = Create("TextButton", Slot, {
         Name = "JoinButton", 
-        Size = UDim2.new(0, 95, 0, 28), 
-        Position = UDim2.new(1, -108, 0, 16),
+        Size = UDim2.new(0, 68, 0, 22), 
+        Position = UDim2.new(1, -78, 0, 10),
         BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
         Font = Enum.Font.Arcade, 
         Text = "JOIN",
         TextColor3 = Color3.fromRGB(255, 255, 255), 
-        TextSize = 14, 
+        TextSize = 11, 
         ZIndex = 6
     }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
 
@@ -328,13 +328,13 @@ function CreateServerSlot(server, index)
 
     local CopyButton = Create("TextButton", Slot, {
         Name = "CopyButton", 
-        Size = UDim2.new(0, 95, 0, 28), 
-        Position = UDim2.new(1, -108, 0, 54),
+        Size = UDim2.new(0, 68, 0, 22), 
+        Position = UDim2.new(1, -78, 0, 40),
         BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
         Font = Enum.Font.Arcade, 
-        Text = "COPY JOIN",
+        Text = "COPY",
         TextColor3 = Color3.fromRGB(255, 255, 255), 
-        TextSize = 12, 
+        TextSize = 10, 
         ZIndex = 6
     }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
 
@@ -345,8 +345,8 @@ function CreateServerSlot(server, index)
     end)
 
     Create("Frame", Slot, {
-        Size = UDim2.new(1, -20, 0, 1), 
-        Position = UDim2.new(0, 10, 1, -1),
+        Size = UDim2.new(1, -14, 0, 1), 
+        Position = UDim2.new(0, 7, 1, -1),
         BackgroundColor3 = Color3.fromRGB(40, 40, 40), 
         BorderSizePixel = 0, 
         ZIndex = 6
@@ -410,7 +410,7 @@ function UpdateServerList(servers)
         CreateServerSlot(server, i)
     end
     
-    ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, #serverFrames * 110)
+    ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, #serverFrames * 80)
 end
 
 function RefreshServers()
@@ -493,7 +493,7 @@ JoinLinkBtn.MouseButton1Click:Connect(function()
         end)
         MiniPopUp.Visible = false
     else
-        MiniTextBox.Text = "Digite um ID válido!"
+        MiniTextBox.Text = "ID inválido!"
         MiniTextBox.TextColor3 = Color3.fromRGB(255, 50, 50)
         task.wait(1.5)
         MiniTextBox.Text = ""
