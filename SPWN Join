@@ -199,7 +199,7 @@ local MiniTextBox = Create("TextBox", textScrollFrame, {
     BackgroundTransparency = 1,
     Font = Enum.Font.SourceSans,
     Text = "",
-    PlaceholderText = "ID: 59b5b7da...",
+    PlaceholderText = "Cole apenas a chave: 4b74e345...",
     PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
     TextColor3 = Color3.fromRGB(0, 0, 0),
     TextSize = 13,
@@ -215,7 +215,7 @@ local function updateTextScroll()
     local textWidth = textLength * charWidth + 20
     local padding = 14
     local frameWidth = textScrollFrame.AbsoluteSize.X - padding
-    
+
     if textWidth > frameWidth and frameWidth > 0 then
         textScrollFrame.CanvasSize = UDim2.new(0, textWidth + padding, 0, 0)
     else
@@ -338,9 +338,10 @@ function CreateServerSlot(server, index)
         ZIndex = 6
     }, nil, { Color = Color3.fromRGB(150, 150, 150), Thickness = 1 })
 
+    -- ✅ CORREÇÃO: COPIA APENAS A CHAVE (ID)
     CopyButton.MouseButton1Click:Connect(function()
-        if Clipboard then
-            Clipboard('Roblox.GameLauncher.joinGameInstance(' .. game.PlaceId .. ', "' .. serverId .. '")')
+        if Clipboard and serverId and serverId ~= "N/A" then
+            Clipboard(serverId)
         end
     end)
 
@@ -358,17 +359,17 @@ end
 
 function GetAllServers(placeId)
     local servers = {}
-    
+
     pcall(function()
         local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
         local data = HttpService:JSONDecode(game:HttpGet(url))
-        
+
         if data and data.data then
             for _, server in ipairs(data.data) do
                 table.insert(servers, server)
             end
         end
-        
+
         local cursor = data.nextPageCursor
         while cursor and #servers < 100 do
             local nextUrl = url .. "&cursor=" .. cursor
@@ -381,7 +382,7 @@ function GetAllServers(placeId)
             cursor = nextData.nextPageCursor
         end
     end)
-    
+
     return servers
 end
 
@@ -390,33 +391,33 @@ function UpdateServerList(servers)
         frame:Destroy()
     end
     serverFrames = {}
-    
+
     if #servers == 0 then
         ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
         return
     end
-    
+
     table.sort(servers, function(a, b)
         return (a.ping or 999) < (b.ping or 999)
     end)
-    
+
     if #servers > 50 then
         for i = #servers, 51, -1 do
             table.remove(servers, i)
         end
     end
-    
+
     for i, server in ipairs(servers) do
         CreateServerSlot(server, i)
     end
-    
+
     ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, #serverFrames * 92)
 end
 
 function RefreshServers()
     if isRefreshing then return end
     isRefreshing = true
-    
+
     task.spawn(function()
         UpdateServerList(GetAllServers(game.PlaceId))
         isRefreshing = false
@@ -428,7 +429,7 @@ local function makeDraggable(obj)
     local dragStart = nil
     local startPos = nil
     local isDragging = false
-    
+
     obj.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or 
            input.UserInputType == Enum.UserInputType.Touch then
@@ -438,7 +439,7 @@ local function makeDraggable(obj)
             startPos = obj.Position
         end
     end)
-    
+
     obj.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or 
            input.UserInputType == Enum.UserInputType.Touch then
@@ -446,7 +447,7 @@ local function makeDraggable(obj)
             isDragging = false
         end
     end)
-    
+
     UIS.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or 
                          input.UserInputType == Enum.UserInputType.Touch) then
@@ -484,16 +485,27 @@ if openMiniBtn then
     end)
 end
 
+-- ✅ CORREÇÃO: JOIN POR ID USA APENAS A CHAVE
 JoinLinkBtn.MouseButton1Click:Connect(function()
     local enteredText = MiniTextBox.Text:match("^%s*(.-)%s*$")
-    
+
     if enteredText and #enteredText > 0 then
-        pcall(function()
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, enteredText, lp)
-        end)
-        MiniPopUp.Visible = false
+        -- Remove espaços extras e garante que é apenas o ID
+        local cleanId = enteredText:match("^[%w%-]+$")
+        if cleanId then
+            pcall(function()
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, cleanId, lp)
+            end)
+            MiniPopUp.Visible = false
+        else
+            MiniTextBox.Text = "ID inválido! Use apenas a chave."
+            MiniTextBox.TextColor3 = Color3.fromRGB(255, 50, 50)
+            task.wait(2)
+            MiniTextBox.Text = ""
+            MiniTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+        end
     else
-        MiniTextBox.Text = "ID inválido!"
+        MiniTextBox.Text = "Digite um ID válido!"
         MiniTextBox.TextColor3 = Color3.fromRGB(255, 50, 50)
         task.wait(1.5)
         MiniTextBox.Text = ""
